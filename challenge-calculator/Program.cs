@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Collections.Generic;
 
 namespace ChallengeCalculator
 {
@@ -10,10 +11,23 @@ namespace ChallengeCalculator
         {
             var split = splitInput(input);
 
+            // maintain a list of encountered negative numbers for the
+            // exception message
+            var negatives = new List<int>();
+
             int sum = 0;
             foreach (var segment in split)
             {
-                sum += interpretAsInteger(segment);
+                var integer = interpretAsInteger(segment);
+                sum += integer;
+                
+                if( integer < 0) {
+                    negatives.Add(integer);
+                }
+            }
+
+            if(negatives.Count > 0){
+                throw new ArgumentException($"Found these negatives: {String.Join(", ", negatives)}" );
             }
 
             return sum;

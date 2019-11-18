@@ -30,7 +30,6 @@ namespace ChallengeCalculatorTests
         public void TestAdd()
         {
             Assert.AreEqual(4, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("2, 2"));
-            Assert.AreEqual(-1, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("2, -3"));
             Assert.AreEqual(2, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("2, bad"));
             Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("bad, worse"));
         }
@@ -47,6 +46,15 @@ namespace ChallengeCalculatorTests
         {
             Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("1\n2,3"));
             Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("1\n2,bad\n3"));
+        }
+
+        [Test]
+        public void TestRejectNegativeNumbers()
+        {
+            var exception = Assert.Throws<ArgumentException>( () => {
+                ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("2, -3, 4, -5");
+            });
+            Assert.AreEqual("Found these negatives: -3, -5", exception.Message);
         }
     }
 }
