@@ -18,7 +18,7 @@ namespace ChallengeCalculator
             int sum = 0;
             foreach (var segment in split)
             {
-                var integer = interpretAsInteger(segment);
+                var integer = interpretAsValidInteger(segment);
                 sum += integer;
                 
                 if( integer < 0) {
@@ -39,14 +39,15 @@ namespace ChallengeCalculator
             return line.Split(new char[] { ',', '\n' });
         }
 
-        // interpret the string as an int, or return 0 on a failure.
-        static int interpretAsInteger(string s)
+        // interpret the string as an int less then or equal to 1000,
+        // or return 0 on a failure.
+        static int interpretAsValidInteger(string s)
         {
             if(!int.TryParse(s.Trim(), out int n))
             {
                 return 0;
             }
-            return n;
+            return n > 1000 ? 0 : n;
         }
 
         static void Main(string[] args)

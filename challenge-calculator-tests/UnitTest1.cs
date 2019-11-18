@@ -56,5 +56,14 @@ namespace ChallengeCalculatorTests
             });
             Assert.AreEqual("Found these negatives: -3, -5", exception.Message);
         }
+
+        [Test]
+        public void TestNumbersGreaterThen1000()
+        {
+            {
+                Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("1\n2,1001,3"));
+                Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("1001,1\n2,bad\n3"));
+            }
+        }
     }
 }
