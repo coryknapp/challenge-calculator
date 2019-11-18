@@ -41,5 +41,12 @@ namespace ChallengeCalculatorTests
             Assert.AreEqual(78, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("1,2,3,4,5,6,7,8,9,10,11,12"));
             Assert.AreEqual(10, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("5,tytyt,5"));
         }
+
+        [Test]
+        public void TestWithNewLineDelimiter()
+        {
+            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("1\n2,3"));
+            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("1\n2,bad\n3"));
+        }
     }
 }

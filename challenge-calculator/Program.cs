@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace ChallengeCalculator
 {
@@ -21,7 +22,7 @@ namespace ChallengeCalculator
         // split an input line into substrings
         static string[] splitInput(string line)
         {
-            return line.Split(',');
+            return line.Split(new char[] { ',', '\n' });
         }
 
         // interpret the string as an int, or return 0 on a failure.
@@ -36,7 +37,27 @@ namespace ChallengeCalculator
 
         static void Main(string[] args)
         {
-            Console.WriteLine(sumCommaDelimitedString(Console.ReadLine()));
+            // collect input until the user hits enter twice, as we're now
+            // supporting /n as a delimiter
+            var inputStringBuilder = new StringBuilder();
+            string lastLine = "";
+
+            do
+            {
+                var line = Console.ReadLine();
+                if( line.Length == 0 && lastLine.Length == 0 ){
+                    break;
+                } else {
+                    inputStringBuilder.Append(line);
+                    inputStringBuilder.Append('\n');
+                    lastLine = line;
+                }
+            } while (lastLine.Length > 0);
+
+            // shave off the last \n that was appended
+            inputStringBuilder.Remove(inputStringBuilder.Length - 2, 1);
+
+            Console.WriteLine( sumCommaDelimitedString( inputStringBuilder.ToString() ));
         }
     }
 }
