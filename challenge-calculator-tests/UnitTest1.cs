@@ -33,22 +33,13 @@ namespace ChallengeCalculatorTests
             Assert.AreEqual(-1, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("2, -3"));
             Assert.AreEqual(2, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("2, bad"));
             Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("bad, worse"));
-
-
         }
 
         [Test]
-        public void TestThrows()
+        public void TestMany()
         {
-            Assert.Throws<FormatException>(
-                delegate {
-                    ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("2, 2, 2");
-                });
-            Assert.Throws<FormatException>(
-                delegate {
-                    ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("bad, worse, ohno");
-                });
-
+            Assert.AreEqual(78, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("1,2,3,4,5,6,7,8,9,10,11,12"));
+            Assert.AreEqual(10, ChallengeCalculator.ChallengeCalculator.sumCommaDelimitedString("5,tytyt,5"));
         }
     }
 }

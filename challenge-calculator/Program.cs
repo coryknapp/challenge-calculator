@@ -9,11 +9,6 @@ namespace ChallengeCalculator
         {
             var split = splitInput(input);
 
-            if (split.Length > 2)
-            {
-                throw new FormatException("Sequences greater then 2 are not yet accepted.");
-            }
-
             int sum = 0;
             foreach (var segment in split)
             {
