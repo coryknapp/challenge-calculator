@@ -6,8 +6,42 @@ namespace ChallengeCalculator
 {
     public class ChallengeCalculator
     {
-       
-        public static int sumCommaDelimitedString(string input)
+        static char? customDelimiter;
+
+        public static string collectUserInput(){
+            // collect input until the user hits enter twice, as we're now
+            // supporting /n as a delimiter
+            var inputStringBuilder = new StringBuilder();
+            string lastLine = "";
+
+            do
+            {
+                var line = Console.ReadLine();
+                if( line.Length == 0 && lastLine.Length == 0 ){
+                    break;
+                } else {
+                    inputStringBuilder.Append(line);
+                    inputStringBuilder.Append('\n');
+                    lastLine = line;
+                }
+            } while (lastLine.Length > 0);
+
+            // shave off the last \n that was appended
+            inputStringBuilder.Remove(inputStringBuilder.Length - 2, 1);
+            return inputStringBuilder.ToString();
+        }
+
+        // Check the input for custom delimiters, and return the remaining string
+        public static string checkForAndSetCustomDelimiter(string input){
+            // delimiter specifier has format: //{delimiter}\n{numbers}
+            if ( input.Substring(0,2) != "//")
+                return input;
+            customDelimiter = input[2];
+            // return without the first for chars that specify the delimiter
+            return input.Substring(4, input.Length - 4);
+        }
+
+        public static int sumString(string input)
         {
             var split = splitInput(input);
 
@@ -36,6 +70,10 @@ namespace ChallengeCalculator
         // split an input line into substrings
         static string[] splitInput(string line)
         {
+            if (customDelimiter.HasValue)
+            {
+                return line.Split(new char[] { ',', '\n', customDelimiter.Value });
+            }
             return line.Split(new char[] { ',', '\n' });
         }
 
@@ -50,29 +88,12 @@ namespace ChallengeCalculator
             return n > 1000 ? 0 : n;
         }
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            // collect input until the user hits enter twice, as we're now
-            // supporting /n as a delimiter
-            var inputStringBuilder = new StringBuilder();
-            string lastLine = "";
+            var userInput = collectUserInput();
+            var processedInput = checkForAndSetCustomDelimiter(userInput);
 
-            do
-            {
-                var line = Console.ReadLine();
-                if( line.Length == 0 && lastLine.Length == 0 ){
-                    break;
-                } else {
-                    inputStringBuilder.Append(line);
-                    inputStringBuilder.Append('\n');
-                    lastLine = line;
-                }
-            } while (lastLine.Length > 0);
-
-            // shave off the last \n that was appended
-            inputStringBuilder.Remove(inputStringBuilder.Length - 2, 1);
-
-            Console.WriteLine( sumCommaDelimitedString( inputStringBuilder.ToString() ));
+            Console.WriteLine( sumString( processedInput ));
         }
     }
 }
