@@ -6,7 +6,7 @@ namespace ChallengeCalculator
 {
     public class ChallengeCalculator
     {
-        static char? customDelimiter;
+        static string customDelimiter;
 
         public static string collectUserInput(){
             // collect input until the user hits enter twice, as we're now
@@ -33,12 +33,30 @@ namespace ChallengeCalculator
 
         // Check the input for custom delimiters, and return the remaining string
         public static string checkForAndSetCustomDelimiter(string input){
-            // delimiter specifier has format: //{delimiter}\n{numbers}
+            // delimiter specifier has format //{delimiter}\n for a
+            // single char and //[{delimiter}]\n for a multi char delimiter
             if ( input.Substring(0,2) != "//")
                 return input;
-            customDelimiter = input[2];
-            // return without the first for chars that specify the delimiter
-            return input.Substring(4, input.Length - 4);
+
+            if ( input[2] == '[') { // multi char delimiter
+                var indexOfFirstNewLine = input.IndexOf('\n');
+
+                // find the delimiter at these char indexes
+                // //[customDelimiter]\n
+                // 0123..............^ = first newline - 1
+
+                customDelimiter = input.Substring(3, indexOfFirstNewLine - 4);
+                // return without the first for chars that specify the delimiter
+                return input.Substring(indexOfFirstNewLine + 1, input.Length - indexOfFirstNewLine - 1);
+            } else { // single char delimiter
+
+                // find the delimiter at these char indexes
+                // //x\n
+                // 0123
+
+                customDelimiter = $"{input[2]}";
+                return input.Substring(4, input.Length - 4);
+            }
         }
 
         public static int sumString(string input)
@@ -70,9 +88,9 @@ namespace ChallengeCalculator
         // split an input line into substrings
         static string[] splitInput(string line)
         {
-            if (customDelimiter.HasValue)
+            if (customDelimiter != null)
             {
-                return line.Split(new char[] { ',', '\n', customDelimiter.Value });
+                return line.Split(new string[] { ",", "\n", customDelimiter }, StringSplitOptions.None);
             }
             return line.Split(new char[] { ',', '\n' });
         }

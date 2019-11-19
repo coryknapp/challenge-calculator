@@ -73,5 +73,15 @@ namespace ChallengeCalculatorTests
             ChallengeCalculator.ChallengeCalculator.Main( new string[0] );
             Assert.AreEqual("10", textWriter.ToString().Trim() );
         }
+
+        [Test]
+        public void TestMultiCharCustomDelimiter()
+        {
+            Console.SetIn(new StringReader("//[test]\n1test2,3\n4test5\n\n"));
+            var textWriter = new StringWriter();
+            Console.SetOut(textWriter);
+            ChallengeCalculator.ChallengeCalculator.Main(new string[0]);
+            Assert.AreEqual("15", textWriter.ToString().Trim());
+        }
     }
 }
