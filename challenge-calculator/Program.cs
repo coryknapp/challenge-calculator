@@ -6,6 +6,20 @@ using System.Linq;
 
 namespace ChallengeCalculator
 {
+    public struct CalculatorResult
+    {
+        public CalculatorResult(int sum, string formula)
+        {
+            this.sum = sum;
+            this.formula = formula;
+        }
+
+        public int sum { get; }
+        public string formula { get; }
+
+        public static implicit operator int(CalculatorResult cr) => cr.sum;
+    }
+
     public class ChallengeCalculator
     {
         static List<string> delimiters = new List<string>() { ",", "\n" };
@@ -28,8 +42,8 @@ namespace ChallengeCalculator
                 }
             } while (lastLine.Length > 0);
 
-            // shave off the last \n that was appended
-            inputStringBuilder.Remove(inputStringBuilder.Length - 2, 1);
+            // shave off the last 2 \n's that was appended
+            inputStringBuilder.Remove(inputStringBuilder.Length - 2, 2);
             return inputStringBuilder.ToString();
         }
 
@@ -63,7 +77,7 @@ namespace ChallengeCalculator
             }
         }
 
-        public static int sumString(string input)
+        public static CalculatorResult sumString(string input)
         {
             var split = splitInput(input);
 
@@ -72,12 +86,17 @@ namespace ChallengeCalculator
             var negatives = new List<int>();
 
             int sum = 0;
+            var formulaStringBuilder = new StringBuilder();
+
             foreach (var segment in split)
             {
                 var integer = interpretAsValidInteger(segment);
                 sum += integer;
-                
-                if( integer < 0) {
+
+                formulaStringBuilder.Append(integer);
+                formulaStringBuilder.Append("+");
+
+                if ( integer < 0) {
                     negatives.Add(integer);
                 }
             }
@@ -86,7 +105,10 @@ namespace ChallengeCalculator
                 throw new ArgumentException($"Found these negatives: {String.Join(", ", negatives)}" );
             }
 
-            return sum;
+            // shave off the last '+'
+            formulaStringBuilder.Remove(formulaStringBuilder.Length - 1, 1);
+
+            return new CalculatorResult(sum, formulaStringBuilder.ToString());
         }
 
         // split an input line into substrings
@@ -111,7 +133,9 @@ namespace ChallengeCalculator
             var userInput = collectUserInput();
             var processedInput = checkForAndSetCustomDelimiters(userInput);
 
-            Console.WriteLine( sumString( processedInput ));
+            var result = sumString(processedInput);
+
+            Console.WriteLine( $"{result.formula} = {result.sum}");
         }
     }
 }

@@ -15,37 +15,37 @@ namespace ChallengeCalculatorTests
         [Test]
         public void TestEmpty()
         {
-            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString(""));
-            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString(","));
+            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString("").sum);
+            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString(",").sum);
         }
 
         [Test]
         public void TestSingle()
         {
-            Assert.AreEqual(2, ChallengeCalculator.ChallengeCalculator.sumString("2"));
-            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString("goop"));
+            Assert.AreEqual(2, ChallengeCalculator.ChallengeCalculator.sumString("2").sum);
+            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString("goop").sum);
         }
 
         [Test]
         public void TestAdd()
         {
-            Assert.AreEqual(4, ChallengeCalculator.ChallengeCalculator.sumString("2, 2"));
-            Assert.AreEqual(2, ChallengeCalculator.ChallengeCalculator.sumString("2, bad"));
-            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString("bad, worse"));
+            Assert.AreEqual(4, ChallengeCalculator.ChallengeCalculator.sumString("2, 2").sum);
+            Assert.AreEqual(2, ChallengeCalculator.ChallengeCalculator.sumString("2, bad").sum);
+            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString("bad, worse").sum);
         }
 
         [Test]
         public void TestMany()
         {
-            Assert.AreEqual(78, ChallengeCalculator.ChallengeCalculator.sumString("1,2,3,4,5,6,7,8,9,10,11,12"));
-            Assert.AreEqual(10, ChallengeCalculator.ChallengeCalculator.sumString("5,tytyt,5"));
+            Assert.AreEqual(78, ChallengeCalculator.ChallengeCalculator.sumString("1,2,3,4,5,6,7,8,9,10,11,12").sum);
+            Assert.AreEqual(10, ChallengeCalculator.ChallengeCalculator.sumString("5,tytyt,5").sum);
         }
 
         [Test]
         public void TestWithNewLineDelimiter()
         {
-            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1\n2,3"));
-            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1\n2,bad\n3"));
+            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1\n2,3").sum);
+            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1\n2,bad\n3").sum);
         }
 
         [Test]
@@ -60,8 +60,8 @@ namespace ChallengeCalculatorTests
         [Test]
         public void TestNumbersGreaterThen1000()
         {
-            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1\n2,1001,3"));
-            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1001,1\n2,bad\n3"));
+            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1\n2,1001,3").sum);
+            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1001,1\n2,bad\n3").sum);
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace ChallengeCalculatorTests
             var textWriter = new StringWriter();
             Console.SetOut( textWriter );
             ChallengeCalculator.ChallengeCalculator.Main( new string[0] );
-            Assert.AreEqual("10", textWriter.ToString().Trim() );
+            Assert.AreEqual("1+2+3+4 = 10", textWriter.ToString().Trim() );
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace ChallengeCalculatorTests
             var textWriter = new StringWriter();
             Console.SetOut(textWriter);
             ChallengeCalculator.ChallengeCalculator.Main(new string[0]);
-            Assert.AreEqual("15", textWriter.ToString().Trim());
+            Assert.AreEqual("1+2+3+4+5 = 15", textWriter.ToString().Trim());
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace ChallengeCalculatorTests
             var textWriter = new StringWriter();
             Console.SetOut(textWriter);
             ChallengeCalculator.ChallengeCalculator.Main(new string[0]);
-            Assert.AreEqual("110", textWriter.ToString().Trim());
+            Assert.AreEqual("11+22+0+33+44 = 110", textWriter.ToString().Trim());
         }
     }
 }
