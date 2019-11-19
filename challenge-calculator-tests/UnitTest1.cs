@@ -83,5 +83,15 @@ namespace ChallengeCalculatorTests
             ChallengeCalculator.ChallengeCalculator.Main(new string[0]);
             Assert.AreEqual("15", textWriter.ToString().Trim());
         }
+
+        [Test]
+        public void TestMultipleMultiCharCustomDelimiter()
+        {
+            Console.SetIn(new StringReader("//[*][!!][r9r]\n11r9r22*hh*33!!44\n\n"));
+            var textWriter = new StringWriter();
+            Console.SetOut(textWriter);
+            ChallengeCalculator.ChallengeCalculator.Main(new string[0]);
+            Assert.AreEqual("110", textWriter.ToString().Trim());
+        }
     }
 }

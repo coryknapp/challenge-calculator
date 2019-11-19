@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChallengeCalculator
 {
     public class ChallengeCalculator
     {
-        static string customDelimiter;
+        static List<string> delimiters = new List<string>() { ",", "\n" };
 
         public static string collectUserInput(){
             // collect input until the user hits enter twice, as we're now
@@ -32,7 +34,7 @@ namespace ChallengeCalculator
         }
 
         // Check the input for custom delimiters, and return the remaining string
-        public static string checkForAndSetCustomDelimiter(string input){
+        public static string checkForAndSetCustomDelimiters(string input){
             // delimiter specifier has format //{delimiter}\n for a
             // single char and //[{delimiter}]\n for a multi char delimiter
             if ( input.Substring(0,2) != "//")
@@ -41,11 +43,13 @@ namespace ChallengeCalculator
             if ( input[2] == '[') { // multi char delimiter
                 var indexOfFirstNewLine = input.IndexOf('\n');
 
-                // find the delimiter at these char indexes
-                // //[customDelimiter]\n
-                // 0123..............^ = first newline - 1
+                // find the delimiters at these char indexes
+                // //[delimiter1][delimiter2]\n
+                // 012.......................^ = first newline
 
-                customDelimiter = input.Substring(3, indexOfFirstNewLine - 4);
+                var delimiterString = input.Substring(2, indexOfFirstNewLine - 2);
+                delimiters.AddRange(Regex.Matches(delimiterString, "(?<=\\[).+?(?=\\])").Cast<Match>().Select( m=> m.Value).ToList());
+
                 // return without the first for chars that specify the delimiter
                 return input.Substring(indexOfFirstNewLine + 1, input.Length - indexOfFirstNewLine - 1);
             } else { // single char delimiter
@@ -54,7 +58,7 @@ namespace ChallengeCalculator
                 // //x\n
                 // 0123
 
-                customDelimiter = $"{input[2]}";
+                delimiters.Add( $"{input[2]}" );
                 return input.Substring(4, input.Length - 4);
             }
         }
@@ -88,11 +92,7 @@ namespace ChallengeCalculator
         // split an input line into substrings
         static string[] splitInput(string line)
         {
-            if (customDelimiter != null)
-            {
-                return line.Split(new string[] { ",", "\n", customDelimiter }, StringSplitOptions.None);
-            }
-            return line.Split(new char[] { ',', '\n' });
+            return line.Split( delimiters.ToArray(), StringSplitOptions.None);
         }
 
         // interpret the string as an int less then or equal to 1000,
@@ -109,7 +109,7 @@ namespace ChallengeCalculator
         public static void Main(string[] args)
         {
             var userInput = collectUserInput();
-            var processedInput = checkForAndSetCustomDelimiter(userInput);
+            var processedInput = checkForAndSetCustomDelimiters(userInput);
 
             Console.WriteLine( sumString( processedInput ));
         }
