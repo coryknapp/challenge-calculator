@@ -20,10 +20,47 @@ namespace ChallengeCalculator
         public static implicit operator int(CalculatorResult cr) => cr.sum;
     }
 
+    public class ChallengeCalculatorOptions
+    {
+        public bool runOnce;// = false;
+        public List<string> delimiters = new List<string>() { ",", "\n" };
+        public bool allowNegative;// = false;
+        public int upperBound = 1000;
+
+        public ChallengeCalculatorOptions(string[] args)
+        {
+            for (int i = 0; i < args.Length; i++)
+            {
+                switch (args[i])
+                {
+                    case "--run-once":
+                        runOnce = true;
+                        break;
+
+                    case "--alternate-delimiter":
+                        delimiters.Remove( "\n" );
+                        delimiters.Add( args[++i][0].ToString() );
+                        break;
+
+                    case "--allow-negative":
+                        allowNegative = true;
+                        break;
+
+                    case "--upper-bound":
+                        upperBound = Int32.Parse(args[++i]);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        
+    }
+
     public class ChallengeCalculator
     {
-        static List<string> delimiters = new List<string>() { ",", "\n" };
-
         public static string collectUserInput(){
             // collect input until the user hits enter twice, as we're now
             // supporting /n as a delimiter
@@ -48,7 +85,7 @@ namespace ChallengeCalculator
         }
 
         // Check the input for custom delimiters, and return the remaining string
-        public static string checkForAndSetCustomDelimiters(string input){
+        public static string checkForAndSetCustomDelimiters(string input, ChallengeCalculatorOptions options){
             // delimiter specifier has format //{delimiter}\n for a
             // single char and //[{delimiter}]\n for a multi char delimiter
             if ( input.Substring(0,2) != "//")
@@ -62,24 +99,24 @@ namespace ChallengeCalculator
                 // 012.......................^ = first newline
 
                 var delimiterString = input.Substring(2, indexOfFirstNewLine - 2);
-                delimiters.AddRange(Regex.Matches(delimiterString, "(?<=\\[).+?(?=\\])").Cast<Match>().Select( m=> m.Value).ToList());
+                options.delimiters.AddRange(Regex.Matches(delimiterString, "(?<=\\[).+?(?=\\])").Cast<Match>().Select( m=> m.Value).ToList());
 
                 // return without the first for chars that specify the delimiter
                 return input.Substring(indexOfFirstNewLine + 1, input.Length - indexOfFirstNewLine - 1);
             } else { // single char delimiter
 
-                // find the delimiter at these char indexes
+                // find the delimiter at this char index
                 // //x\n
                 // 0123
 
-                delimiters.Add( $"{input[2]}" );
+                options.delimiters.Add( $"{input[2]}" );
                 return input.Substring(4, input.Length - 4);
             }
         }
 
-        public static CalculatorResult sumString(string input)
+        public static CalculatorResult sumString(string input, ChallengeCalculatorOptions options)
         {
-            var split = splitInput(input);
+            var split = splitInput(input, options);
 
             // maintain a list of encountered negative numbers for the
             // exception message
@@ -90,13 +127,13 @@ namespace ChallengeCalculator
 
             foreach (var segment in split)
             {
-                var integer = interpretAsValidInteger(segment);
+                var integer = interpretAsValidInteger(segment, options);
                 sum += integer;
 
                 formulaStringBuilder.Append(integer);
                 formulaStringBuilder.Append("+");
 
-                if ( integer < 0) {
+                if ( integer < 0 && !options.allowNegative) {
                     negatives.Add(integer);
                 }
             }
@@ -112,40 +149,41 @@ namespace ChallengeCalculator
         }
 
         // split an input line into substrings
-        static string[] splitInput(string line)
+        static string[] splitInput(string line, ChallengeCalculatorOptions options)
         {
-            return line.Split( delimiters.ToArray(), StringSplitOptions.None);
+            return line.Split(options.delimiters.ToArray(), StringSplitOptions.None);
         }
 
         // interpret the string as an int less then or equal to 1000,
         // or return 0 on a failure.
-        static int interpretAsValidInteger(string s)
+        static int interpretAsValidInteger(string s, ChallengeCalculatorOptions options)
         {
             if(!int.TryParse(s.Trim(), out int n))
             {
                 return 0;
             }
-            return n > 1000 ? 0 : n;
+            return n > options.upperBound ? 0 : n;
         }
 
         public static void Main(string[] args)
         {
+            var options = new ChallengeCalculatorOptions(args);
+
             // process custom delimiters on first run
             var userInput = collectUserInput();
-            var processedInput = checkForAndSetCustomDelimiters(userInput);
-            var result = sumString(processedInput);
+            var processedInput = checkForAndSetCustomDelimiters(userInput, options);
+            var result = sumString(processedInput, options);
             Console.WriteLine( $"{result.formula} = {result.sum}");
 
             // run once option (used in unit tests)
-            if (args.Contains("--run-once"))
-            {
+            if(options.runOnce == true){
                 return;
             }
 
             while(true){
                 // do no process custom delimiters on subsequent runs
                 userInput = collectUserInput();
-                result = sumString(processedInput);
+                result = sumString(processedInput, options);
                 Console.WriteLine( $"{result.formula} = {result.sum}");
             }
         }

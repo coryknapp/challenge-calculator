@@ -12,47 +12,57 @@ namespace ChallengeCalculatorTests
         {
         }
 
+        private int runSumStringWithDefaultOptions(string input)
+        {
+            return ChallengeCalculator.ChallengeCalculator.sumString(
+                input,
+                new ChallengeCalculator.ChallengeCalculatorOptions(
+                    new string[] { }
+                    )
+                ).sum;
+        }
+
         [Test]
         public void TestEmpty()
         {
-            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString("").sum);
-            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString(",").sum);
+            Assert.AreEqual(0, runSumStringWithDefaultOptions(""));
+            Assert.AreEqual(0, runSumStringWithDefaultOptions(","));
         }
 
         [Test]
         public void TestSingle()
         {
-            Assert.AreEqual(2, ChallengeCalculator.ChallengeCalculator.sumString("2").sum);
-            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString("goop").sum);
+            Assert.AreEqual(2, runSumStringWithDefaultOptions("2"));
+            Assert.AreEqual(0, runSumStringWithDefaultOptions("goop"));
         }
 
         [Test]
         public void TestAdd()
         {
-            Assert.AreEqual(4, ChallengeCalculator.ChallengeCalculator.sumString("2, 2").sum);
-            Assert.AreEqual(2, ChallengeCalculator.ChallengeCalculator.sumString("2, bad").sum);
-            Assert.AreEqual(0, ChallengeCalculator.ChallengeCalculator.sumString("bad, worse").sum);
+            Assert.AreEqual(4, runSumStringWithDefaultOptions("2, 2"));
+            Assert.AreEqual(2, runSumStringWithDefaultOptions("2, bad"));
+            Assert.AreEqual(0, runSumStringWithDefaultOptions("bad, worse"));
         }
 
         [Test]
         public void TestMany()
         {
-            Assert.AreEqual(78, ChallengeCalculator.ChallengeCalculator.sumString("1,2,3,4,5,6,7,8,9,10,11,12").sum);
-            Assert.AreEqual(10, ChallengeCalculator.ChallengeCalculator.sumString("5,tytyt,5").sum);
+            Assert.AreEqual(78, runSumStringWithDefaultOptions("1,2,3,4,5,6,7,8,9,10,11,12"));
+            Assert.AreEqual(10, runSumStringWithDefaultOptions("5,tytyt,5"));
         }
 
         [Test]
         public void TestWithNewLineDelimiter()
         {
-            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1\n2,3").sum);
-            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1\n2,bad\n3").sum);
+            Assert.AreEqual(6, runSumStringWithDefaultOptions("1\n2,3"));
+            Assert.AreEqual(6, runSumStringWithDefaultOptions("1\n2,bad\n3"));
         }
 
         [Test]
         public void TestRejectNegativeNumbers()
         {
             var exception = Assert.Throws<ArgumentException>( () => {
-                ChallengeCalculator.ChallengeCalculator.sumString("2, -3, 4, -5");
+                runSumStringWithDefaultOptions("2, -3, 4, -5");
             });
             Assert.AreEqual("Found these negatives: -3, -5", exception.Message);
         }
@@ -60,8 +70,8 @@ namespace ChallengeCalculatorTests
         [Test]
         public void TestNumbersGreaterThen1000()
         {
-            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1\n2,1001,3").sum);
-            Assert.AreEqual(6, ChallengeCalculator.ChallengeCalculator.sumString("1001,1\n2,bad\n3").sum);
+            Assert.AreEqual(6, runSumStringWithDefaultOptions("1\n2,1001,3"));
+            Assert.AreEqual(6, runSumStringWithDefaultOptions("1001,1\n2,bad\n3"));
         }
 
         [Test]
@@ -92,6 +102,49 @@ namespace ChallengeCalculatorTests
             Console.SetOut(textWriter);
             ChallengeCalculator.ChallengeCalculator.Main(new string[] { "--run-once" } );
             Assert.AreEqual("11+22+0+33+44 = 110", textWriter.ToString().Trim());
+        }
+
+        [Test]
+        public void TestAlternateDelimiterCommandLineOption()
+        {
+            Console.SetIn(new StringReader("1?2,3?4\n\n"));
+            var textWriter = new StringWriter();
+            Console.SetOut(textWriter);
+            ChallengeCalculator.ChallengeCalculator.Main(new string[] { "--run-once", "--alternate-delimiter", "?"} );
+            Assert.AreEqual("1+2+3+4 = 10", textWriter.ToString().Trim());
+        }
+
+        [Test]
+        public void TestAlternateDelimiterCommandLineOptionReplacesNewLineDelimiter()
+        {
+            // If we're defining an alternate delimiter to the one in step #3 then, a new line should
+            // no longer work as a delimiter and the `2\n3` should be interpreted as a `0`
+
+            Console.SetIn(new StringReader("1?2\n3,4\n\n"));
+            var textWriter = new StringWriter();
+            Console.SetOut(textWriter);
+            ChallengeCalculator.ChallengeCalculator.Main(new string[] { "--run-once", "--alternate-delimiter", "?"} );
+            Assert.AreEqual("1+0+4 = 5", textWriter.ToString().Trim());
+        }
+
+        [Test]
+        public void TestAllowNegativeNumbersCommandLineOption()
+        {
+            Console.SetIn(new StringReader("-1,-2,3,4\n\n"));
+            var textWriter = new StringWriter();
+            Console.SetOut(textWriter);
+            ChallengeCalculator.ChallengeCalculator.Main(new string[] { "--run-once", "--allow-negative"} );
+            Assert.AreEqual("-1+-2+3+4 = 4", textWriter.ToString().Trim());
+        }
+
+        [Test]
+        public void TestUpperBoundCommandLineOption()
+        {
+            Console.SetIn(new StringReader("1,100,101\n\n"));
+            var textWriter = new StringWriter();
+            Console.SetOut(textWriter);
+            ChallengeCalculator.ChallengeCalculator.Main(new string[] { "--run-once", "--upper-bound", "100"} );
+            Assert.AreEqual("1+100+0 = 101", textWriter.ToString().Trim());
         }
     }
 }
