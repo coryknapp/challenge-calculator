@@ -70,7 +70,7 @@ namespace ChallengeCalculatorTests
             Console.SetIn( new StringReader( "//?\n1?2,3\n4\n\n") );
             var textWriter = new StringWriter();
             Console.SetOut( textWriter );
-            ChallengeCalculator.ChallengeCalculator.Main( new string[0] );
+            ChallengeCalculator.ChallengeCalculator.Main(new string[] { "--run-once" });
             Assert.AreEqual("1+2+3+4 = 10", textWriter.ToString().Trim() );
         }
 
@@ -80,7 +80,7 @@ namespace ChallengeCalculatorTests
             Console.SetIn(new StringReader("//[test]\n1test2,3\n4test5\n\n"));
             var textWriter = new StringWriter();
             Console.SetOut(textWriter);
-            ChallengeCalculator.ChallengeCalculator.Main(new string[0]);
+            ChallengeCalculator.ChallengeCalculator.Main(new string[] { "--run-once" });
             Assert.AreEqual("1+2+3+4+5 = 15", textWriter.ToString().Trim());
         }
 
@@ -90,7 +90,7 @@ namespace ChallengeCalculatorTests
             Console.SetIn(new StringReader("//[*][!!][r9r]\n11r9r22*hh*33!!44\n\n"));
             var textWriter = new StringWriter();
             Console.SetOut(textWriter);
-            ChallengeCalculator.ChallengeCalculator.Main(new string[0]);
+            ChallengeCalculator.ChallengeCalculator.Main(new string[] { "--run-once" } );
             Assert.AreEqual("11+22+0+33+44 = 110", textWriter.ToString().Trim());
         }
     }

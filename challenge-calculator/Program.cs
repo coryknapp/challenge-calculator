@@ -130,12 +130,24 @@ namespace ChallengeCalculator
 
         public static void Main(string[] args)
         {
+            // process custom delimiters on first run
             var userInput = collectUserInput();
             var processedInput = checkForAndSetCustomDelimiters(userInput);
-
             var result = sumString(processedInput);
-
             Console.WriteLine( $"{result.formula} = {result.sum}");
+
+            // run once option (used in unit tests)
+            if (args.Contains("--run-once"))
+            {
+                return;
+            }
+
+            while(true){
+                // do no process custom delimiters on subsequent runs
+                userInput = collectUserInput();
+                result = sumString(processedInput);
+                Console.WriteLine( $"{result.formula} = {result.sum}");
+            }
         }
     }
 }
